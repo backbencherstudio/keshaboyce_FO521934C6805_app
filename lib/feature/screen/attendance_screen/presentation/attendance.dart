@@ -81,13 +81,13 @@ class _AttendanceState extends State<Attendance> {
                   _buildDateField(),
                   const SizedBox(height: 12),
 
-                  Row(
-                    children: [
-                      Expanded(child: _buildTimeField('Start Time', _startTimeController)),
-                      const SizedBox(width: 8),
-                      Expanded(child: _buildTimeField('End Time', _endTimeController)),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     Expanded(child: _buildTimeField('Start Time', _startTimeController)),
+                  //     const SizedBox(width: 8),
+                  //     Expanded(child: _buildTimeField('End Time', _endTimeController)),
+                  //   ],
+                  // ),
                   const SizedBox(height: 12),
 
                   _buildObservationsField(),

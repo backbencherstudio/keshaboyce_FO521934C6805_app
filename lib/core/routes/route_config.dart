@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../feature/screen/Attendance_log_screen/presentation/widget/attendence_log_header.dart';
+import 'package:flutter_newprojct/feature/screen/Attendance_log_screen/presentation/widget/attendence_log_header.dart';
 import '../../feature/screen/Time_off_screen/presentation/time_off_screen.dart';
 import '../../feature/screen/Attendance_log_screen/presentation/attendance_log.dart';
 import '../../feature/screen/attendance_screen/presentation/attendance.dart';
@@ -17,32 +17,32 @@ class RouteConfig {
         name: RouteName.splashScreen,
         path: RouteName.splashScreen,
         pageBuilder: (context, state) =>
-            const MaterialPage(child: SplashScreen()),
+        const MaterialPage(child: SplashScreen()),
       ),
       GoRoute(
         name: RouteName.attendance,
         path: RouteName.attendance,
         pageBuilder: (context, state) =>
-            const MaterialPage(child: Attendance()),
+        const MaterialPage(child: Attendance()),
       ),
       GoRoute(
         name: RouteName.homescreen,
         path: RouteName.homescreen,
         pageBuilder: (context, state) =>
-            const MaterialPage(child: HomeScreen()),
+        const MaterialPage(child: HomeScreen()),
       ),
       GoRoute(
         name: RouteName.timeOffscreen,
         path: RouteName.timeOffscreen,
         pageBuilder: (context, state) =>
-            const MaterialPage(child: TimeOffScreen()),
+            MaterialPage(child: TimeOffScreen()),
       ),
       GoRoute(
         name: RouteName.attendanceLog,
         path: RouteName.attendanceLog,
         pageBuilder: (context, state) =>
-            const MaterialPage(child: AttendanceLog()),
-      )
+        const MaterialPage(child: AttendanceLog()),
+      ),
     ],
   );
 }

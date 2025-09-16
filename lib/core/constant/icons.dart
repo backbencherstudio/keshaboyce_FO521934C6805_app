@@ -5,6 +5,7 @@ class AppIcons{
   static const String logoPng = '$iconPath/logo.png';
   static const String calender = '$iconPath/calender.svg';
   static const String dropDownSvg = '$iconPath/drop_down.svg';
+  static const String clockSvg = '$iconPath/clock.svg';
 
 
 }

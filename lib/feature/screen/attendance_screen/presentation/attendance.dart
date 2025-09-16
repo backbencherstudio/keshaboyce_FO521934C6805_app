@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_newprojct/core/constant/icons.dart';
 import 'package:flutter_newprojct/core/theme/theme_extension/app_colors.dart';
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/submit_alert_dialog.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../common_widgets/custom_calender.dart';
 import 'package:flutter_newprojct/feature/common_widgets/custom_button.dart';
+
+import '../../Attendance_log_screen/presentation/widget/custom_button_3.dart';
 
 class Attendance extends StatefulWidget {
   const Attendance({super.key});
@@ -81,39 +85,43 @@ class _AttendanceState extends State<Attendance> {
                   _buildDateField(),
                   const SizedBox(height: 12),
 
-                  // Row(
-                  //   children: [
-                  //     Expanded(child: _buildTimeField('Start Time', _startTimeController)),
-                  //     const SizedBox(width: 8),
-                  //     Expanded(child: _buildTimeField('End Time', _endTimeController)),
-                  //   ],
-                  // ),
+                  Row(
+                    children: [
+                      Expanded(child: _buildTimeField('Start Time', _startTimeController)),
+                      const SizedBox(width: 8),
+                      Expanded(child: _buildTimeField('End Time', _endTimeController)),
+                    ],
+                  ),
                   const SizedBox(height: 12),
 
                   _buildObservationsField(),
                   const SizedBox(height: 24),
 
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: CustomButtonSecondary.build(
-                          text: "Save Draft",
-                          onPressed: () {
-                            // Save draft logic
-                          },
+                      CustomButton(
+                        title: 'Save Draft',
+                        textStyle: style.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textColor3,
                         ),
+                        width: 162.w,
+                        containerColor: AppColors.whiteBackgroundColor,
+                        border:
+                        Border.all(color: AppColors.textContainerColor),
+                        style: style,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: CustomButtonPrimary.build(
-                          text: "Submit",
-                          onPressed: () {
-                            onStartJobTap(context);
-                          },
-                        ),
+                      SizedBox(width: 11.w),
+                      CustomButton(
+                        onPress: () => onStartJobTap(context),
+                        title: 'Submit',
+                        width: 162.w,
+                        style: style,
                       ),
                     ],
                   ),
+                  SizedBox(height: 24.h),
                 ],
               ),
             ),

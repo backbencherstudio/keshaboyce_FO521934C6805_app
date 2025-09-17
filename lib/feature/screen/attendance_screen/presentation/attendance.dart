@@ -3,10 +3,8 @@ import 'package:flutter_newprojct/core/constant/icons.dart';
 import 'package:flutter_newprojct/core/theme/theme_extension/app_colors.dart';
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/submit_alert_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../common_widgets/custom_calender.dart';
-import 'package:flutter_newprojct/feature/common_widgets/custom_button.dart';
 
 import '../../Attendance_log_screen/presentation/widget/custom_button_3.dart';
 
@@ -47,7 +45,8 @@ class _AttendanceState extends State<Attendance> {
                 const SizedBox(height: 40),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.arrow_back, size: 24, color: Colors.white),
+                  child: const Icon(Icons.arrow_back,
+                      size: 24, color: Colors.white),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -76,31 +75,34 @@ class _AttendanceState extends State<Attendance> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTextField('Client name', 'Ex. Sharah A.',),
+                  _buildTextField(
+                    'Client name',
+                    'Ex. Sharah A.',
+                  ),
                   const SizedBox(height: 12),
-
                   _buildTextField('Caregiver name', 'Ex. John Carter'),
                   const SizedBox(height: 12),
-
                   _buildDateField(),
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
-                      Expanded(child: _buildTimeField('Start Time', _startTimeController)),
+                      Expanded(
+                          child: _buildTimeField(
+                              'Start Time', _startTimeController)),
                       const SizedBox(width: 8),
-                      Expanded(child: _buildTimeField('End Time', _endTimeController)),
+                      Expanded(
+                          child:
+                              _buildTimeField('End Time', _endTimeController)),
                     ],
                   ),
                   const SizedBox(height: 12),
-
                   _buildObservationsField(),
                   const SizedBox(height: 24),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomButton(
+                        onPress: (){},
                         title: 'Save Draft',
                         textStyle: style.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
@@ -108,8 +110,7 @@ class _AttendanceState extends State<Attendance> {
                         ),
                         width: 162.w,
                         containerColor: AppColors.whiteBackgroundColor,
-                        border:
-                        Border.all(color: AppColors.textContainerColor),
+                        border: Border.all(color: AppColors.textContainerColor),
                         style: style,
                       ),
                       SizedBox(width: 11.w),
@@ -145,7 +146,8 @@ class _AttendanceState extends State<Attendance> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           suffixIcon: Padding(
             padding: const EdgeInsets.all(14.0),
-            child: SvgPicture.asset(AppIcons.calender, height: 24, width: 24),
+            child:
+                SvgPicture.asset(AppIcons.clockSvg, height: 16.h, width: 16.w),
           ),
         ),
         onTap: () => selectDate(context, _dateController),
@@ -153,7 +155,7 @@ class _AttendanceState extends State<Attendance> {
     );
   }
 
-  // Time Field
+// Time Field
   Widget _buildTimeField(String label, TextEditingController controller) {
     return _buildLabeledField(
       label: label,
@@ -164,11 +166,13 @@ class _AttendanceState extends State<Attendance> {
           hintText: 'Select time',
           filled: true,
           fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           suffixIcon: Padding(
             padding: const EdgeInsets.all(14.0),
-            child: SvgPicture.asset('asset/icon/Icon(1).svg', width: 24, height: 24, fit: BoxFit.scaleDown),
+            child:
+                SvgPicture.asset(AppIcons.clockSvg, height: 16.h, width: 16.w),
           ),
         ),
         onTap: () => selectTime(context, controller),
@@ -176,7 +180,7 @@ class _AttendanceState extends State<Attendance> {
     );
   }
 
-  // Text Field
+// Text Field with Icon in Container
   Widget _buildTextField(String label, String hint) {
     return _buildLabeledField(
       label: label,
@@ -186,6 +190,15 @@ class _AttendanceState extends State<Attendance> {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          suffixIcon: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: SvgPicture.asset(
+              'asset/icon/Icon(1).svg', // same icon here
+              width: 24,
+              height: 24,
+              fit: BoxFit.scaleDown,
+            ),
+          ),
         ),
         style: const TextStyle(color: Colors.black),
       ),
@@ -203,7 +216,8 @@ class _AttendanceState extends State<Attendance> {
           hintText: 'Type the notable observations here...',
           filled: true,
           fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
         style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -219,7 +233,10 @@ class _AttendanceState extends State<Attendance> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textColor)),
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textColor)),
           const SizedBox(height: 8),
           child,
         ],

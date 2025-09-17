@@ -148,15 +148,36 @@ class _AttendanceLogState extends State<AttendanceLog> {
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Scheduled Shift*', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         hintText: 'Select your shift',
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(
+                            AppIcons.dropDownSvg,
+                            height: 24.h,
+                            width: 24.w,
+                          ),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: null, // No value selected initially
+                      items: ['Morning', 'Day', 'Night']
+                          .map((shift) => DropdownMenuItem(
+                        value: shift,
+                        child: Text(shift, style: TextStyle(fontSize: 14.sp)),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        print("Selected Shift: $value");
+                      },
                     ),
+
+
                     SizedBox(height: 12.h),
                     Row(
                       children: [
@@ -168,39 +189,99 @@ class _AttendanceLogState extends State<AttendanceLog> {
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Status', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a option',
+                        hintStyle: style.bodySmall, // control text size here
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(
+                            AppIcons.dropDownSvg,
+                            height: 24.h, // icon size
+                            width: 24.w,  // fix icon size
+                          ),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
+                      value: null,
+                      items: [' Late Arrival ', ' No Show ', 'On Time']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        print("Selected Reason: $value");
+                      },
                     ),
+
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Notes', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a reason',
+                        hintStyle: style.bodySmall, // control text size here
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(
+                            AppIcons.dropDownSvg,
+                            height: 24.h, // icon size
+                            width: 24.w,  // fix icon size
+                          ),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
+                      value: null,
+                      items: ['Vacation', 'Family', 'Medical', 'Other']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        print("Selected Reason: $value");
+                      },
                     ),
+
+
                     SizedBox(height: 12.h),
 
                     InputLabel(labelText: 'Violation (optional)',  style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a option',
+                        hintStyle: style.bodySmall, // control text size here
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(
+                            AppIcons.dropDownSvg,
+                            height: 24.h, // icon size
+                            width: 24.w,  // fix icon size
+                          ),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
+                      value: null,
+                      items: [' Verbal Warning', 'Written Warning',' None ', 'Final Warning']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        print("Selected Reason: $value");
+                      },
                     ),
 
                     SizedBox(height: 12.h),
@@ -208,7 +289,9 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       children: [
                         Expanded(
                           child: CustomButton(
+                            onPress: (){},
                             title: 'Save Draft',
+
                             textStyle: style.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: AppColors.textColor3,

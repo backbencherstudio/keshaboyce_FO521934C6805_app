@@ -12,7 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../common_widgets/custom_calender.dart';
 
 class TimeOffScreen extends StatelessWidget {
-  TimeOffScreen({super.key});
+  TimeOffScreen({super.key, required Map<String, String> draftData});
 
   // Controllers for date fields
   final TextEditingController fromDateController = TextEditingController();
@@ -83,40 +83,72 @@ class TimeOffScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12.h),
 
-                  // Notes
+                  // Notes Label
                   InputLabel(labelText: 'Notes', optional: '*', style: style),
                   SizedBox(height: 8.h),
-                  TextFormField(
+
+                  DropdownButtonFormField<String>(
                     decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
                       hintText: 'Select a reason',
+                      hintStyle: style.bodySmall, // control text size here
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       suffixIcon: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
+                        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
                         child: SvgPicture.asset(
                           AppIcons.dropDownSvg,
-                          height: 4.h,
-                          width: 10.h,
+                          height: 24.h, // icon size
+                          width: 24.w,  // fix icon size
                         ),
                       ),
                     ),
+                    style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
+                    initialValue: null,
+                    items: ['Vacation', 'Family', 'Medical', 'Other']
+                        .map((reason) => DropdownMenuItem(
+                      value: reason,
+                      child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                    ))
+                        .toList(),
+                    onChanged: (value) {
+                    },
                   ),
+
                   SizedBox(height: 12.h),
 
-                  // Status
+                // Status Dropdown
                   InputLabel(labelText: 'Status', optional: '*', style: style),
                   SizedBox(height: 8.h),
-                  TextFormField(
+
+                  DropdownButtonFormField<String>(
                     decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
                       hintText: 'Select an option',
+                      hintStyle: TextStyle(fontSize: 14.sp),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       suffixIcon: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
+                        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
                         child: SvgPicture.asset(
                           AppIcons.dropDownSvg,
-                          height: 4.h,
-                          width: 10.h,
+                          height: 24.h, // icon size
+                          width: 24.w,  //  icon size
                         ),
                       ),
                     ),
+                    style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                    initialValue: null,
+                    items: ['Pending', 'Approved', 'Denied']
+                        .map((status) => DropdownMenuItem(
+                      value: status,
+                      child: Text(status, style: TextStyle(fontSize: 14.sp)),
+                    ))
+                        .toList(),
+                    onChanged: (value) {
+                    },
                   ),
+
                   SizedBox(height: 12.h),
 
                   // Additional Notes
@@ -140,6 +172,7 @@ class TimeOffScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: CustomButton(
+                          onPress: (){},
                           title: 'Save Draft',
                           textStyle: style.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,

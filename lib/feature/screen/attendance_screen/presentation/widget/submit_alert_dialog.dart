@@ -51,6 +51,7 @@ void onStartJobTap(BuildContext context) {
               CustomButton(
                   onPress: (){
                     context.push(RouteName.homescreen);
+                    _clearDraft();
                   },
                   style: style),
               SizedBox(
@@ -71,6 +72,9 @@ void onStartJobTap(BuildContext context) {
       );
     },
   );
+}
+
+void _clearDraft() {
 }
 
 

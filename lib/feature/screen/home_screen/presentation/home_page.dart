@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.textContainerColor,
+                 color:  Color(0xff092549),
                 borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(8.r),
                   bottomLeft: Radius.circular(8.r),
@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Welcome to',
                       style: style.headlineSmall?.copyWith(
-                        color: AppColors.textColor2,
+                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'KEY ROSE HOME CARE',
                       style: style.bodyMedium?.copyWith(
-                        color: AppColors.textColor5,
+                        color: const Color(0xFFE9E9EA),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

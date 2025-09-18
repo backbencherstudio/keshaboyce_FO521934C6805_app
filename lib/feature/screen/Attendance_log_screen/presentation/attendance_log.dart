@@ -3,6 +3,7 @@ import 'package:flutter_newprojct/feature/common_widgets/custom_calender.dart';
 import 'package:flutter_newprojct/feature/screen/Attendance_log_screen/presentation/widget/attendence_log_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/constant/icons.dart';
 import '../../../../core/theme/theme_extension/app_colors.dart';
 import '../../Time_off_screen/presentation/widget/input_label.dart';
@@ -17,55 +18,85 @@ class AttendanceLog extends StatefulWidget {
 }
 
 class _AttendanceLogState extends State<AttendanceLog> {
-  // Move all controllers to the State class
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
 
+  String? _selectedShift;
+  String? _selectedStatus;
+  String? _selectedNote;
+  String? _selectedViolation;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDraft();
+  }
+
+  /// Load draft from Hive
+  void _loadDraft() {
+    final draftBox = Hive.box('draftBox');
+    final savedData = draftBox.get('attendance_log_draft');
+
+    if (savedData != null) {
+      _fromDateController.text = savedData['date'] ?? '';
+      _startTimeController.text = savedData['startTime'] ?? '';
+      _endTimeController.text = savedData['endTime'] ?? '';
+      _selectedShift = savedData['shift'];
+      _selectedStatus = savedData['status'];
+      _selectedNote = savedData['note'];
+      _selectedViolation = savedData['violation'];
+      setState(() {});
+    }
+  }
+
+  /// Save draft locally
+  void _saveDraft() async {
+    final draftBox = Hive.box('draftBox');
+    final draftData = {
+      'date': _fromDateController.text,
+      'startTime': _startTimeController.text,
+      'endTime': _endTimeController.text,
+      'shift': _selectedShift,
+      'status': _selectedStatus,
+      'note': _selectedNote,
+      'violation': _selectedViolation,
+      'createdAt': DateTime.now().toString(),
+    };
+    await draftBox.put('attendance_log_draft', draftData);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Draft Saved Successfully")),
+    );
+  }
+
+  /// Clear draft after submit
+  void _clearDraft() async {
+    final draftBox = Hive.box('draftBox');
+    await draftBox.delete('attendance_log_draft');
+
+    _fromDateController.clear();
+    _startTimeController.clear();
+    _endTimeController.clear();
+    _selectedShift = null;
+    _selectedStatus = null;
+    _selectedNote = null;
+    _selectedViolation = null;
+    setState(() {});
+  }
+
+  /// Pick time helper
   Future<void> _pickTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              dialTextColor: AppColors.textContainerColor,
-              hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
-                return AppColors.textContainerColor;
-              }),
-              hourMinuteColor: WidgetStateColor.resolveWith((states) {
-                return Colors.white;
-              }),
-              helpTextStyle: const TextStyle(color: AppColors.textContainerColor),
-              dayPeriodTextColor: AppColors.textContainerColor,
-              dayPeriodColor: WidgetStateColor.resolveWith((states) {
-                return Colors.white;
-              }),
-              dialHandColor: AppColors.textContainerColor,
-              entryModeIconColor: AppColors.textContainerColor,
-            ),
-            textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: AppColors.textContainerColor,
-              displayColor: AppColors.textContainerColor,
-            ),
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.textContainerColor,
-              onSurface: AppColors.textContainerColor,
-            ),
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
     );
-
     if (pickedTime != null) {
       controller.text = pickedTime.format(context);
     }
   }
 
-  // Add date picker function
+  /// Pick date helper
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -73,12 +104,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     );
-
     if (pickedDate != null) {
       _fromDateController.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
     }
   }
-
 
   Widget _buildTimeField(String label, TextEditingController controller) {
     return Column(
@@ -289,7 +318,16 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       children: [
                         Expanded(
                           child: CustomButton(
-                            onPress: (){},
+                            onPress: () {
+                              _saveDraft(); // Save the draft
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Draft Saved Successfully"), //Success message
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
                             title: 'Save Draft',
 
                             textStyle: style.bodyMedium?.copyWith(
@@ -305,11 +343,16 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         SizedBox(width: 11.w),
                         Expanded(
                           child: CustomButton(
+
                             title: 'Submit',
                             width: 162.w,
                             style: style,
-                            onPress: () {
+                            onPress: () async {
                               onStartJobTap(context);
+                              final draftBox = Hive.box('draftBox');
+
+                              await draftBox.delete('attendance_draft');
+                              _clearDraft();
                             },
                           ),
                         ),

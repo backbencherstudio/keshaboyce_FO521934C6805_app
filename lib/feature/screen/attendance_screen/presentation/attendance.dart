@@ -4,8 +4,8 @@ import 'package:flutter_newprojct/core/theme/theme_extension/app_colors.dart';
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/submit_alert_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../common_widgets/custom_calender.dart';
-
 import '../../Attendance_log_screen/presentation/widget/custom_button_3.dart';
 
 class Attendance extends StatefulWidget {
@@ -16,10 +16,65 @@ class Attendance extends StatefulWidget {
 }
 
 class _AttendanceState extends State<Attendance> {
+  final TextEditingController _clientNameController = TextEditingController();
+  final TextEditingController _caregiverNameController =
+      TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDraft(); // Load saved draft on page open
+  }
+
+  ///  Load saved data from Hive
+  void _loadDraft() {
+    final draftBox = Hive.box('draftBox');
+    final savedData = draftBox.get('attendance_draft');
+
+    if (savedData != null) {
+      _clientNameController.text = savedData['clientName'] ?? '';
+      _caregiverNameController.text = savedData['caregiverName'] ?? '';
+      _dateController.text = savedData['date'] ?? '';
+      _startTimeController.text = savedData['startTime'] ?? '';
+      _endTimeController.text = savedData['endTime'] ?? '';
+      _observationsController.text = savedData['observations'] ?? '';
+    }
+  }
+
+  /// Save draft data locally
+  void _saveDraft() async {
+    final draftBox = Hive.box('draftBox');
+
+    final draftData = {
+      'clientName': _clientNameController.text,
+      'caregiverName': _caregiverNameController.text,
+      'date': _dateController.text,
+      'startTime': _startTimeController.text,
+      'endTime': _endTimeController.text,
+      'observations': _observationsController.text,
+      'createdAt': DateTime.now().toString(),
+    };
+
+    await draftBox.put('attendance_draft', draftData); // Save by key
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Draft Saved Successfully")),
+    );
+  }
+
+  /// Clear draft after submit if needed
+  void _clearDraft() {
+    _clientNameController.clear();
+    _caregiverNameController.clear();
+    _dateController.clear();
+    _startTimeController.clear();
+    _endTimeController.clear();
+    _observationsController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +131,10 @@ class _AttendanceState extends State<Attendance> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTextField(
-                    'Client name',
-                    'Ex. Sharah A.',
-                  ),
+                      'Client name', 'Ex. Sharah A.', _clientNameController),
                   const SizedBox(height: 12),
-                  _buildTextField('Caregiver name', 'Ex. John Carter'),
+                  _buildTextField('Caregiver name', 'Ex. John Carter',
+                      _caregiverNameController),
                   const SizedBox(height: 12),
                   _buildDateField(),
                   const SizedBox(height: 12),
@@ -102,7 +156,16 @@ class _AttendanceState extends State<Attendance> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomButton(
-                        onPress: (){},
+                        onPress: () {
+                          _saveDraft(); // Save the draft
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Draft Saved Successfully"), //Success message
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
                         title: 'Save Draft',
                         textStyle: style.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
@@ -115,7 +178,13 @@ class _AttendanceState extends State<Attendance> {
                       ),
                       SizedBox(width: 11.w),
                       CustomButton(
-                        onPress: () => onStartJobTap(context),
+                        onPress: () async {
+                          onStartJobTap(context);
+                          final draftBox = Hive.box('draftBox');
+
+                          await draftBox.delete('attendance_draft');
+                          _clearDraft();
+                        },
                         title: 'Submit',
                         width: 162.w,
                         style: style,
@@ -155,7 +224,7 @@ class _AttendanceState extends State<Attendance> {
     );
   }
 
-// Time Field
+  // Time Field
   Widget _buildTimeField(String label, TextEditingController controller) {
     return _buildLabeledField(
       label: label,
@@ -180,25 +249,18 @@ class _AttendanceState extends State<Attendance> {
     );
   }
 
-// Text Field with Icon in Container
-  Widget _buildTextField(String label, String hint) {
+  // Text Field
+  Widget _buildTextField(
+      String label, String hint, TextEditingController controller) {
     return _buildLabeledField(
       label: label,
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          suffixIcon: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: SvgPicture.asset(
-              'asset/icon/Icon(1).svg', // same icon here
-              width: 24,
-              height: 24,
-              fit: BoxFit.scaleDown,
-            ),
-          ),
         ),
         style: const TextStyle(color: Colors.black),
       ),

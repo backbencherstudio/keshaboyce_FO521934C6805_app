@@ -183,11 +183,11 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                       initialValue: null,
                       items: ['Vacation', 'Family', 'Medical', 'Other']
                           .map((reason) => DropdownMenuItem(
-                                value: reason,
-                                child: Text(reason,
-                                    style:
-                                        TextStyle(fontSize: 14.sp)), // same size
-                              ))
+                        value: reason,
+                        child: Text(reason,
+                            style:
+                            TextStyle(fontSize: 14.sp)), // same size
+                      ))
                           .toList(),
                       onChanged: (value) {},
                     ),
@@ -220,10 +220,10 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                       initialValue: null,
                       items: ['Pending', 'Approved', 'Denied']
                           .map((status) => DropdownMenuItem(
-                                value: status,
-                                child: Text(status,
-                                    style: TextStyle(fontSize: 14.sp)),
-                              ))
+                        value: status,
+                        child: Text(status,
+                            style: TextStyle(fontSize: 14.sp)),
+                      ))
                           .toList(),
                       onChanged: (value) {},
                     ),
@@ -270,7 +270,7 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                             width: 162.w,
                             containerColor: AppColors.whiteBackgroundColor,
                             border:
-                                Border.all(color: AppColors.textContainerColor),
+                            Border.all(color: AppColors.textContainerColor),
                             style: style,
                           ),
                         ),

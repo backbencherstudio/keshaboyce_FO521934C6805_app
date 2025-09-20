@@ -5,6 +5,7 @@ import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../../../core/service/google_sheet_api.dart';
 import '../../../common_widgets/custom_calender.dart';
 import '../../Attendance_log_screen/presentation/widget/custom_button_3.dart';
 
@@ -29,6 +30,8 @@ class _AttendanceState extends State<Attendance> {
     super.initState();
     _loadDraft(); // Load saved draft on page open
   }
+
+
 
   ///  Load saved data from Hive
   void _loadDraft() {
@@ -66,15 +69,6 @@ class _AttendanceState extends State<Attendance> {
     );
   }
 
-  /// Clear draft after submit if needed
-  void _clearDraft() {
-    _clientNameController.clear();
-    _caregiverNameController.clear();
-    _dateController.clear();
-    _startTimeController.clear();
-    _endTimeController.clear();
-    _observationsController.clear();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,16 +172,32 @@ class _AttendanceState extends State<Attendance> {
                       ),
                       SizedBox(width: 11.w),
                       CustomButton(
-                        onPress: () async {
-                          onStartJobTap(context);
-                          final draftBox = Hive.box('draftBox');
-
-                          await draftBox.delete('attendance_draft');
-                          _clearDraft();
-                        },
                         title: 'Submit',
                         width: 162.w,
                         style: style,
+                        onPress: () async {
+                          try {
+                            GoogleSheetService g = GoogleSheetService();
+                            await g.init();
+                            await g.insertUser(
+                              clientname: _clientNameController.text,
+                              caregivername: _caregiverNameController.text,
+                              date: _dateController.text,
+                              start_time: _startTimeController.text,
+                              end_time: _endTimeController.text,
+                              observation: _observationsController.text,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Data submitted successfully")),
+                            );
+                            onStartJobTap(context);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error submitting data: $e")),
+                            );
+                          }
+                        },
+
                       ),
                     ],
                   ),

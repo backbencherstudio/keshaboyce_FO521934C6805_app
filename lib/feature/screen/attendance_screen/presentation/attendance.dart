@@ -190,7 +190,7 @@ class _AttendanceState extends State<Attendance> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Data submitted successfully")),
                             );
-                            onStartJobTap(context);
+                            onStartJobTap(context,'Tom Submitted');
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Error submitting data: $e")),

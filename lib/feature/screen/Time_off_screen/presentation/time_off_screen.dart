@@ -285,39 +285,25 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                       children: [
                         Expanded(
                           child: CustomButton(
-                            onPress: () async {
-                              if (_fromDateTEController.text.isEmpty ||
-                                  _toDateTEController.text.isEmpty ||
-                                  _selectedNote == null ||
-                                  _selectedStatus == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please fill all required fields")),
-                                );
-                                return;
-                              }
-                              try {
-                                GoogleSheetService g = GoogleSheetService();
-                                await g.init();
-                                await g.insertTimeOffRequest(
-                                  fromDate: _fromDateTEController.text,
-                                  toDate: _toDateTEController.text,
-                                  notes: _selectedNote!,
-                                  status: _selectedStatus!,
-                                  additionalNotes: _additionalStatusTEController.text,
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Data submitted successfully")),
-                                );
-                                _submit();
-                                onStartJobTap(context);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Error submitting data: $e")),
-                                );
-                              }
+                            onPress: () {
+                              _saveDraft(); // Save the draft
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Draft Saved Successfully"), //Success message
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
                             },
-                            title: 'Submit',
+                            title: 'Save Draft',
+                            textStyle: style.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textColor3,
+                            ),
                             width: 162.w,
+                            containerColor: AppColors.whiteBackgroundColor,
+                            border:
+                            Border.all(color: AppColors.textContainerColor),
                             style: style,
                           ),
                         ),
@@ -339,7 +325,7 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                                   const SnackBar(content: Text("Data submitted successfully")),
                                 );
                                 _submit(); // Clear draft and reset form
-                                onStartJobTap(context);
+                                onStartJobTap(context,"RTO Submitted");
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text("Error submitting data: $e")),

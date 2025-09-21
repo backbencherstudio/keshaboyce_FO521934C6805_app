@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_newprojct/feature/common_widgets/custom_calender.dart';
 import 'package:flutter_newprojct/feature/screen/Attendance_log_screen/presentation/widget/attendence_log_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/constant/icons.dart';
+import '../../../../core/service/google_sheet_api.dart';
 import '../../../../core/theme/theme_extension/app_colors.dart';
 import '../../Time_off_screen/presentation/widget/input_label.dart';
 import '../../attendance_screen/presentation/widget/custom_button.dart';
@@ -17,55 +18,86 @@ class AttendanceLog extends StatefulWidget {
 }
 
 class _AttendanceLogState extends State<AttendanceLog> {
-  // Move all controllers to the State class
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
 
-  Future<void> _pickTime(BuildContext context, TextEditingController controller) async {
+  String? _selectedShift;
+  String? _selectedStatus;
+  String? _selectedNote;
+  String? _selectedViolation;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDraft();
+  }
+
+  /// Load draft from Hive
+  void _loadDraft() {
+    final draftBox = Hive.box('draftBox');
+    final savedData = draftBox.get('attendance_log_draft');
+
+    if (savedData != null) {
+      _fromDateController.text = savedData['date'] ?? '';
+      _startTimeController.text = savedData['startTime'] ?? '';
+      _endTimeController.text = savedData['endTime'] ?? '';
+      _selectedShift = savedData['shift'];
+      _selectedStatus = savedData['status'];
+      _selectedNote = savedData['note'];
+      _selectedViolation = savedData['violation'];
+      setState(() {});
+    }
+  }
+
+  /// Save draft locally
+  void _saveDraft() async {
+    final draftBox = Hive.box('draftBox');
+    final draftData = {
+      'date': _fromDateController.text,
+      'startTime': _startTimeController.text,
+      'endTime': _endTimeController.text,
+      'shift': _selectedShift,
+      'status': _selectedStatus,
+      'note': _selectedNote,
+      'violation': _selectedViolation,
+      'createdAt': DateTime.now().toString(),
+    };
+    await draftBox.put('attendance_log_draft', draftData);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Draft Saved Successfully")),
+    );
+  }
+
+  /// Clear draft after submit
+  void _clearDraft() async {
+    final draftBox = Hive.box('draftBox');
+    await draftBox.delete('attendance_log_draft');
+
+    _fromDateController.clear();
+    _startTimeController.clear();
+    _endTimeController.clear();
+    _selectedShift = null;
+    _selectedStatus = null;
+    _selectedNote = null;
+    _selectedViolation = null;
+    setState(() {});
+  }
+
+  /// Pick time helper
+  Future<void> _pickTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            timePickerTheme: TimePickerThemeData(
-              dialTextColor: AppColors.textContainerColor,
-              hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
-                return AppColors.textContainerColor;
-              }),
-              hourMinuteColor: WidgetStateColor.resolveWith((states) {
-                return Colors.white;
-              }),
-              helpTextStyle: const TextStyle(color: AppColors.textContainerColor),
-              dayPeriodTextColor: AppColors.textContainerColor,
-              dayPeriodColor: WidgetStateColor.resolveWith((states) {
-                return Colors.white;
-              }),
-              dialHandColor: AppColors.textContainerColor,
-              entryModeIconColor: AppColors.textContainerColor,
-            ),
-            textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: AppColors.textContainerColor,
-              displayColor: AppColors.textContainerColor,
-            ),
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.textContainerColor,
-              onSurface: AppColors.textContainerColor,
-            ),
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
     );
-
     if (pickedTime != null) {
       controller.text = pickedTime.format(context);
     }
   }
 
-  // Add date picker function
+  /// Pick date helper
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -73,18 +105,20 @@ class _AttendanceLogState extends State<AttendanceLog> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     );
-
     if (pickedDate != null) {
-      _fromDateController.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      _fromDateController.text =
+      "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
     }
   }
-
 
   Widget _buildTimeField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InputLabel(labelText: label, optional: '*', style: Theme.of(context).textTheme),
+        InputLabel(
+            labelText: label,
+            optional: '*',
+            style: Theme.of(context).textTheme),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
@@ -94,7 +128,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
             hintText: 'Select time',
             suffixIcon: Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              child: SvgPicture.asset(AppIcons.clockSvg, height: 16.h, width: 16.w),
+              child: SvgPicture.asset(AppIcons.clockSvg,
+                  height: 16.h, width: 16.w),
             ),
           ),
         ),
@@ -140,7 +175,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.h),
-                            child: SvgPicture.asset(AppIcons.calender, height: 16.h, width: 16.w),
+                            child: SvgPicture.asset(AppIcons.calender,
+                                height: 16.h, width: 16.w),
                           ),
                         ),
                       ),
@@ -148,14 +184,31 @@ class _AttendanceLogState extends State<AttendanceLog> {
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Scheduled Shift*', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         hintText: 'Select your shift',
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedShift,
+                      items: ['Morning', 'Day', 'Night']
+                          .map((shift) => DropdownMenuItem(
+                        value: shift,
+                        child: Text(shift, style: TextStyle(fontSize: 14.sp)),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedShift = value;
+                        });
+                      },
                     ),
                     SizedBox(height: 12.h),
                     Row(
@@ -168,46 +221,96 @@ class _AttendanceLogState extends State<AttendanceLog> {
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Status', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a option',
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedStatus,
+                      items: ['Late Arrival', 'No Show', 'On Time']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStatus = value;
+                        });
+                      },
                     ),
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Notes', optional: '*', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a reason',
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedNote,
+                      items: ['Vacation', 'Family', 'Medical', 'Other']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedNote = value;
+                        });
+                      },
                     ),
                     SizedBox(height: 12.h),
-
-                    InputLabel(labelText: 'Violation (optional)',  style: style),
+                    InputLabel(labelText: 'Violation (optional)', style: style),
                     SizedBox(height: 8.h),
-                    TextFormField(
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        hintText: 'Select an option',
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Select a option',
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.h),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 4.h, width: 10.h),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedViolation,
+                      items: ['Verbal Warning', 'Written Warning', 'None', 'Final Warning']
+                          .map((reason) => DropdownMenuItem(
+                        value: reason,
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
+                      ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedViolation = value;
+                        });
+                      },
                     ),
-
                     SizedBox(height: 12.h),
                     Row(
                       children: [
                         Expanded(
                           child: CustomButton(
+                            onPress: _saveDraft,
                             title: 'Save Draft',
                             textStyle: style.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
@@ -225,9 +328,38 @@ class _AttendanceLogState extends State<AttendanceLog> {
                             title: 'Submit',
                             width: 162.w,
                             style: style,
-                            onPress: () {
-                              onStartJobTap(context);
+                            onPress: () async {
+                              if (_selectedShift == null || _selectedStatus == null || _selectedNote == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please fill all required fields")),
+                                );
+                                return; // Stop further execution
+                              }
+
+                              try {
+                                GoogleSheetService g = GoogleSheetService();
+                                await g.init();
+                                await g.insertAttendanceLog(
+                                  date: _fromDateController.text,
+                                  scheduledShift: _selectedShift!,   // safe now because of check above
+                                  clockIn: _startTimeController.text,
+                                  clockOut: _endTimeController.text,
+                                  status: _selectedStatus!,
+                                  notes: _selectedNote!,
+                                  violation: _selectedViolation ?? '',
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Data submitted successfully")),
+                                );
+                                _clearDraft();
+                                onStartJobTap(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error submitting data: $e")),
+                                );
+                              }
                             },
+
                           ),
                         ),
                       ],

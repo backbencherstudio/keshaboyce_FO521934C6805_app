@@ -7,14 +7,16 @@ import 'package:go_router/go_router.dart';
 
 import 'custom_button.dart';
 
-void onStartJobTap(BuildContext context) {
+// Add a 'title' parameter to the function
+void onStartJobTap(BuildContext context, String title) {
   showDialog(
     context: context,
     builder: (_) {
       final style = Theme.of(context).textTheme;
+
       return Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16.r),
+          borderRadius: BorderRadius.circular(16.r), // Fixed typo: BorderRadiusGeometry to BorderRadius
         ),
         backgroundColor: AppColors.whiteBackgroundColor,
         elevation: 1,
@@ -31,41 +33,46 @@ void onStartJobTap(BuildContext context) {
               SizedBox(
                 height: 14,
               ),
-              Text('TOM Submitted',style:style.headlineSmall?.copyWith(
-                color: AppColors.textColor3,
-                fontWeight: FontWeight.w700,
-
-              ) ,),
+              Text(
+                title, // Use the passed title parameter
+                style: style.headlineSmall?.copyWith(
+                  color: AppColors.textColor3,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               SizedBox(
                 height: 8,
               ),
               Text(
                 textAlign: TextAlign.center,
-                'Congratulations, The Report\nsubmit has been completed',style: style.titleSmall?.copyWith(
-                color: AppColors.textColor4,
-                fontWeight: FontWeight.w500,
-              ),),
+                'Congratulations, The Report\nsubmit has been completed',
+                style: style.titleSmall?.copyWith(
+                  color: AppColors.textColor4,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               SizedBox(
                 height: 24,
               ),
               CustomButton(
-                  onPress: (){
-                    context.push(RouteName.homescreen);
-                    _clearDraft();
-                  },
-                  style: style),
+                onPress: () {
+                  context.push(RouteName.homescreen);
+                  _clearDraft();
+                },
+                style: style,
+              ),
               SizedBox(
                 height: 24,
               ),
               CustomButton(
-                  onPress: (){
-                    Navigator.pop(context);
-                  },
-                  containerColor: AppColors.whiteBackgroundColor,
-                  textStyle:
-                  style.bodyMedium?.copyWith(color: AppColors.textColor3),
-                  title: 'Close the App',
-                  style: style),
+                onPress: () {
+                  Navigator.pop(context);
+                },
+                containerColor: AppColors.whiteBackgroundColor,
+                textStyle: style.bodyMedium?.copyWith(color: AppColors.textColor3),
+                title: 'Close the App',
+                style: style,
+              ),
             ],
           ),
         ),
@@ -76,8 +83,3 @@ void onStartJobTap(BuildContext context) {
 
 void _clearDraft() {
 }
-
-
-
-
-

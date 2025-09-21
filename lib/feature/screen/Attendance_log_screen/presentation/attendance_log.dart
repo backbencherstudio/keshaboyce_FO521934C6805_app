@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/constant/icons.dart';
+import '../../../../core/service/google_sheet_api.dart';
 import '../../../../core/theme/theme_extension/app_colors.dart';
 import '../../Time_off_screen/presentation/widget/input_label.dart';
 import '../../attendance_screen/presentation/widget/custom_button.dart';
@@ -85,7 +86,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
   }
 
   /// Pick time helper
-  Future<void> _pickTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _pickTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -104,7 +106,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
       lastDate: DateTime(2030),
     );
     if (pickedDate != null) {
-      _fromDateController.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      _fromDateController.text =
+      "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
     }
   }
 
@@ -112,7 +115,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InputLabel(labelText: label, optional: '*', style: Theme.of(context).textTheme),
+        InputLabel(
+            labelText: label,
+            optional: '*',
+            style: Theme.of(context).textTheme),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
@@ -122,7 +128,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
             hintText: 'Select time',
             suffixIcon: Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              child: SvgPicture.asset(AppIcons.clockSvg, height: 16.h, width: 16.w),
+              child: SvgPicture.asset(AppIcons.clockSvg,
+                  height: 16.h, width: 16.w),
             ),
           ),
         ),
@@ -168,7 +175,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.h),
-                            child: SvgPicture.asset(AppIcons.calender, height: 16.h, width: 16.w),
+                            child: SvgPicture.asset(AppIcons.calender,
+                                height: 16.h, width: 16.w),
                           ),
                         ),
                       ),
@@ -185,15 +193,11 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(
-                            AppIcons.dropDownSvg,
-                            height: 24.h,
-                            width: 24.w,
-                          ),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
-                      value: null, // No value selected initially
+                      value: _selectedShift,
                       items: ['Morning', 'Day', 'Night']
                           .map((shift) => DropdownMenuItem(
                         value: shift,
@@ -201,11 +205,11 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       ))
                           .toList(),
                       onChanged: (value) {
-                        print("Selected Shift: $value");
+                        setState(() {
+                          _selectedShift = value;
+                        });
                       },
                     ),
-
-
                     SizedBox(height: 12.h),
                     Row(
                       children: [
@@ -222,30 +226,27 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Select a option',
-                        hintStyle: style.bodySmall, // control text size here
+                        hintStyle: style.bodySmall,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(
-                            AppIcons.dropDownSvg,
-                            height: 24.h, // icon size
-                            width: 24.w,  // fix icon size
-                          ),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
-                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
-                      value: null,
-                      items: [' Late Arrival ', ' No Show ', 'On Time']
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedStatus,
+                      items: ['Late Arrival', 'No Show', 'On Time']
                           .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
                       ))
                           .toList(),
                       onChanged: (value) {
-                        print("Selected Reason: $value");
+                        setState(() {
+                          _selectedStatus = value;
+                        });
                       },
                     ),
-
                     SizedBox(height: 12.h),
                     InputLabel(labelText: 'Notes', optional: '*', style: style),
                     SizedBox(height: 8.h),
@@ -254,81 +255,63 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Select a reason',
-                        hintStyle: style.bodySmall, // control text size here
+                        hintStyle: style.bodySmall,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(
-                            AppIcons.dropDownSvg,
-                            height: 24.h, // icon size
-                            width: 24.w,  // fix icon size
-                          ),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
-                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
-                      value: null,
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedNote,
                       items: ['Vacation', 'Family', 'Medical', 'Other']
                           .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
                       ))
                           .toList(),
                       onChanged: (value) {
-                        print("Selected Reason: $value");
+                        setState(() {
+                          _selectedNote = value;
+                        });
                       },
                     ),
-
-
                     SizedBox(height: 12.h),
-
-                    InputLabel(labelText: 'Violation (optional)',  style: style),
+                    InputLabel(labelText: 'Violation (optional)', style: style),
                     SizedBox(height: 8.h),
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Select a option',
-                        hintStyle: style.bodySmall, // control text size here
+                        hintStyle: style.bodySmall,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(
-                            AppIcons.dropDownSvg,
-                            height: 24.h, // icon size
-                            width: 24.w,  // fix icon size
-                          ),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
                         ),
                       ),
-                      style: TextStyle(fontSize: 14.sp, color: Colors.black), // normal text size
-                      value: null,
-                      items: [' Verbal Warning', 'Written Warning',' None ', 'Final Warning']
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedViolation,
+                      items: ['Verbal Warning', 'Written Warning', 'None', 'Final Warning']
                           .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(reason, style: TextStyle(fontSize: 14.sp)), // same size
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
                       ))
                           .toList(),
                       onChanged: (value) {
-                        print("Selected Reason: $value");
+                        setState(() {
+                          _selectedViolation = value;
+                        });
                       },
                     ),
-
                     SizedBox(height: 12.h),
                     Row(
                       children: [
                         Expanded(
                           child: CustomButton(
-                            onPress: () {
-                              _saveDraft(); // Save the draft
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      "Draft Saved Successfully"), //Success message
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            },
+                            onPress: _saveDraft,
                             title: 'Save Draft',
-
                             textStyle: style.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: AppColors.textColor3,
@@ -342,17 +325,41 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         SizedBox(width: 11.w),
                         Expanded(
                           child: CustomButton(
-
                             title: 'Submit',
                             width: 162.w,
                             style: style,
                             onPress: () async {
-                              onStartJobTap(context);
-                              final draftBox = Hive.box('draftBox');
+                              if (_selectedShift == null || _selectedStatus == null || _selectedNote == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please fill all required fields")),
+                                );
+                                return; // Stop further execution
+                              }
 
-                              await draftBox.delete('attendance_draft');
-                              _clearDraft();
+                              try {
+                                GoogleSheetService g = GoogleSheetService();
+                                await g.init();
+                                await g.insertAttendanceLog(
+                                  date: _fromDateController.text,
+                                  scheduledShift: _selectedShift!,   // safe now because of check above
+                                  clockIn: _startTimeController.text,
+                                  clockOut: _endTimeController.text,
+                                  status: _selectedStatus!,
+                                  notes: _selectedNote!,
+                                  violation: _selectedViolation ?? '',
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Data submitted successfully")),
+                                );
+                                _clearDraft();
+                                onStartJobTap(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error submitting data: $e")),
+                                );
+                              }
                             },
+
                           ),
                         ),
                       ],

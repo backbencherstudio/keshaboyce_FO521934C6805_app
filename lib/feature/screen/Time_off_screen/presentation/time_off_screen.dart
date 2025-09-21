@@ -7,6 +7,7 @@ import 'package:flutter_newprojct/feature/screen/Time_off_screen/presentation/wi
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/custom_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/service/google_sheet_api.dart';
 import '../../../common_widgets/custom_calender.dart';
 import '../../attendance_screen/presentation/widget/submit_alert_dialog.dart';
 import '../time_off_provider/time_off_provider.dart';
@@ -164,32 +165,30 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Select a reason',
-                        hintStyle: style.bodySmall, // control text size here
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                        hintStyle: style.bodySmall,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 8.h, horizontal: 8.w),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
                           child: SvgPicture.asset(
                             AppIcons.dropDownSvg,
-                            height: 24.h, // icon size
-                            width: 24.w, // fix icon size
+                            height: 24.h,
+                            width: 24.w,
                           ),
                         ),
                       ),
-                      style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.black), // normal text size
-                      initialValue: null,
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      value: _selectedNote, // Bind to _selectedNote
                       items: ['Vacation', 'Family', 'Medical', 'Other']
                           .map((reason) => DropdownMenuItem(
                         value: reason,
-                        child: Text(reason,
-                            style:
-                            TextStyle(fontSize: 14.sp)), // same size
+                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
                       ))
                           .toList(),
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedNote = value; // Update _selectedNote
+                        });
+                      },
                     ),
 
                     SizedBox(height: 12.h),
@@ -198,34 +197,68 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                     InputLabel(labelText: 'Status', optional: '*', style: style),
                     SizedBox(height: 8.h),
 
+                    // Notes Dropdown
+                    // DropdownButtonFormField<String>(
+                    //   decoration: InputDecoration(
+                    //     filled: true,
+                    //     fillColor: Colors.white,
+                    //     hintText: 'Select a reason',
+                    //     hintStyle: style.bodySmall,
+                    //     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    //     suffixIcon: Padding(
+                    //       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                    //       child: SvgPicture.asset(
+                    //         AppIcons.dropDownSvg,
+                    //         height: 24.h,
+                    //         width: 24.w,
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                    //   value: _selectedNote, // Bind to _selectedNote
+                    //   items: ['Vacation', 'Family', 'Medical', 'Other']
+                    //       .map((reason) => DropdownMenuItem(
+                    //     value: reason,
+                    //     child: Text(reason, style: TextStyle(fontSize: 14.sp)),
+                    //   ))
+                    //       .toList(),
+                    //   onChanged: (value) {
+                    //     setState(() {
+                    //       _selectedNote = value; // Update _selectedNote
+                    //     });
+                    //   },
+                    // ),
+
+// Status Dropdown
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
                         hintText: 'Select an option',
                         hintStyle: TextStyle(fontSize: 14.sp),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 8.h, horizontal: 8.w),
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
                           child: SvgPicture.asset(
                             AppIcons.dropDownSvg,
-                            height: 24.h, // icon size
-                            width: 24.w, //  icon size
+                            height: 24.h,
+                            width: 24.w,
                           ),
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
-                      initialValue: null,
+                      value: _selectedStatus, // Bind to _selectedStatus
                       items: ['Pending', 'Approved', 'Denied']
                           .map((status) => DropdownMenuItem(
                         value: status,
-                        child: Text(status,
-                            style: TextStyle(fontSize: 14.sp)),
+                        child: Text(status, style: TextStyle(fontSize: 14.sp)),
                       ))
                           .toList(),
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStatus = value; // Update _selectedStatus
+                        });
+                      },
                     ),
 
                     SizedBox(height: 12.h),
@@ -252,32 +285,67 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                       children: [
                         Expanded(
                           child: CustomButton(
-                            onPress: () {
-                              _saveDraft(); // Save the draft
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      "Draft Saved Successfully"), //Success message
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
+                            onPress: () async {
+                              if (_fromDateTEController.text.isEmpty ||
+                                  _toDateTEController.text.isEmpty ||
+                                  _selectedNote == null ||
+                                  _selectedStatus == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please fill all required fields")),
+                                );
+                                return;
+                              }
+                              try {
+                                GoogleSheetService g = GoogleSheetService();
+                                await g.init();
+                                await g.insertTimeOffRequest(
+                                  fromDate: _fromDateTEController.text,
+                                  toDate: _toDateTEController.text,
+                                  notes: _selectedNote!,
+                                  status: _selectedStatus!,
+                                  additionalNotes: _additionalStatusTEController.text,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Data submitted successfully")),
+                                );
+                                _submit();
+                                onStartJobTap(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error submitting data: $e")),
+                                );
+                              }
                             },
-                            title: 'Save Draft',
-                            textStyle: style.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textColor3,
-                            ),
+                            title: 'Submit',
                             width: 162.w,
-                            containerColor: AppColors.whiteBackgroundColor,
-                            border:
-                            Border.all(color: AppColors.textContainerColor),
                             style: style,
                           ),
                         ),
                         SizedBox(width: 11.w),
                         Expanded(
                           child: CustomButton(
-                            onPress: () => onStartJobTap(context),
+                            onPress: () async {
+                              try {
+                                GoogleSheetService g = GoogleSheetService();
+                                await g.init();
+                                await g.insertTimeOffRequest(
+                                  fromDate: _fromDateTEController.text,
+                                  toDate: _toDateTEController.text,
+                                  notes: _selectedNote!,
+                                  status: _selectedStatus!,
+                                  additionalNotes: _additionalStatusTEController.text,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Data submitted successfully")),
+                                );
+                                _submit(); // Clear draft and reset form
+                                onStartJobTap(context);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Error submitting data: $e")),
+                                );
+                              }
+                            },
                             title: 'Submit',
                             width: 162.w,
                             style: style,

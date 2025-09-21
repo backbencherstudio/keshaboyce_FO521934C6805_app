@@ -313,7 +313,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
                                 onStartJobTap(context,"Attendance Log Submitted");
                                 _clearDraft();
                                 // Replace with appropriate navigation or action
-                                // onStartJobTap(context);
+                                onStartJobTap(context,'Attendence log Submitted');
                                 Navigator.pop(context); // Example: Go back after submission
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(

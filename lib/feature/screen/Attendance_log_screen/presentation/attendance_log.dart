@@ -25,7 +25,6 @@ class _AttendanceLogState extends State<AttendanceLog> {
 
   String? _selectedShift;
   String? _selectedStatus;
-  String? _selectedViolation;
 
   @override
   void initState() {
@@ -63,6 +62,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
     };
     await draftBox.put('attendance_log_draft', draftData);
 
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Draft Saved Successfully")),
     );
@@ -79,7 +79,6 @@ class _AttendanceLogState extends State<AttendanceLog> {
     _observationsController.clear(); // Added
     _selectedShift = null;
     _selectedStatus = null;
-    _selectedViolation = null;
     setState(() {});
   }
 
@@ -91,6 +90,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
       initialTime: TimeOfDay.now(),
     );
     if (pickedTime != null) {
+      // ignore: use_build_context_synchronously
       controller.text = pickedTime.format(context);
     }
   }
@@ -194,6 +194,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      // ignore: deprecated_member_use
                       value: _selectedShift,
                       items: ['Morning', 'Evening', 'Over Night']
                           .map((shift) => DropdownMenuItem(
@@ -231,6 +232,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      // ignore: deprecated_member_use
                       value: _selectedStatus,
                       items: ['Late Arrival', 'No Show']
                           .map((reason) => DropdownMenuItem(
@@ -307,15 +309,20 @@ class _AttendanceLogState extends State<AttendanceLog> {
                                   notes: '', // Removed _selectedNote
                                   violation: _observationsController.text,
                                 );
+                                // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Data submitted successfully")),
                                 );
+                                // ignore: use_build_context_synchronously
                                 onStartJobTap(context,"Attendance Log Submitted");
                                 _clearDraft();
                                 // Replace with appropriate navigation or action
+                                // ignore: use_build_context_synchronously
                                 onStartJobTap(context,'Attendence log Submitted');
+                                // ignore: use_build_context_synchronously
                                 Navigator.pop(context); // Example: Go back after submission
                               } catch (e) {
+                                // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text("Failed to submit data: $e")),
                                 );

@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _moveToNextScreen() async {
     await Future.delayed(const Duration(seconds: 2)); // 2s splash duration
+    // ignore: use_build_context_synchronously
     context.pushReplacement(RouteName.homescreen); // ✅ Go to HomeScreen
   }
 

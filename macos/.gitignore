@@ -5,5 +5,5 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
-**/asset/credentials.json
+**/asset/credential.json
 **/lib/core/service/google_sheet_api.dart

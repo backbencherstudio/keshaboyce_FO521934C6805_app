@@ -8,10 +8,8 @@ import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/service/google_sheet_api.dart';
-import '../../../common_widgets/custom_calender.dart';
 import '../../attendance_screen/presentation/widget/submit_alert_dialog.dart';
 import '../time_off_provider/time_off_provider.dart';
-
 
 class TimeOffScreen extends ConsumerStatefulWidget {
   const TimeOffScreen({super.key});
@@ -23,8 +21,9 @@ class TimeOffScreen extends ConsumerStatefulWidget {
 class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
   final TextEditingController _fromDateTEController = TextEditingController();
   final TextEditingController _toDateTEController = TextEditingController();
-  final TextEditingController _additionalStatusTEController = TextEditingController();
-  final GlobalKey _formKey=GlobalKey();
+  final TextEditingController _additionalStatusTEController =
+      TextEditingController();
+  final GlobalKey _formKey = GlobalKey();
 
   String? _selectedNote;
   String? _selectedStatus;
@@ -61,23 +60,41 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     // TODO: Handle submit logic (send to server or Google Sheet)
     ref.read(timeOffDraftProvider.notifier).clearDraft();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Submitted Successfully")),
-    );
 
     _fromDateTEController.clear();
     _toDateTEController.clear();
     _selectedNote = null;
     _selectedStatus = null;
     _additionalStatusTEController.clear();
-    setState(() {});
+
+    try {
+      GoogleSheetService g = GoogleSheetService();
+      await g.init();
+      await g.insertTimeOffRequest(
+        fromDate: _fromDateTEController.text,
+        toDate: _toDateTEController.text,
+        notes: _selectedNote ?? '',
+        status: _selectedStatus ?? '',
+        additionalNotes: _additionalStatusTEController.text,
+      );
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Submitted Successfully")),
+      );
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error submitting data: $e")),
+      );
+    }
   }
 
-  Future<void> selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> selectDate(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -85,7 +102,8 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
       lastDate: DateTime(2030),
     );
     if (pickedDate != null) {
-      controller.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      controller.text =
+          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
     }
   }
 
@@ -119,7 +137,8 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                       decoration: InputDecoration(
                         hintText: 'Select a date',
                         suffixIcon: InkWell(
-                          onTap: () => selectDate(context, _fromDateTEController),
+                          onTap: () =>
+                              selectDate(context, _fromDateTEController),
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 8.h),
                             child: SvgPicture.asset(
@@ -134,7 +153,8 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                     SizedBox(height: 12.h),
 
                     // To Date
-                    InputLabel(labelText: 'To Date', optional: '*', style: style),
+                    InputLabel(
+                        labelText: 'To Date', optional: '*', style: style),
                     SizedBox(height: 8.h),
                     TextFormField(
                       controller: _toDateTEController,
@@ -166,9 +186,11 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                         fillColor: Colors.white,
                         hintText: 'Select a reason',
                         hintStyle: style.bodySmall,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.h, horizontal: 8.w),
                           child: SvgPicture.asset(
                             AppIcons.dropDownSvg,
                             height: 24.h,
@@ -177,12 +199,14 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      // ignore: deprecated_member_use
                       value: _selectedNote, // Bind to _selectedNote
                       items: ['Vacation', 'Family', 'Medical', 'Other']
                           .map((reason) => DropdownMenuItem(
-                        value: reason,
-                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
-                      ))
+                                value: reason,
+                                child: Text(reason,
+                                    style: TextStyle(fontSize: 14.sp)),
+                              ))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -194,7 +218,8 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                     SizedBox(height: 12.h),
 
                     // Status Dropdown
-                    InputLabel(labelText: 'Status', optional: '*', style: style),
+                    InputLabel(
+                        labelText: 'Status', optional: '*', style: style),
                     SizedBox(height: 8.h),
 
                     // Notes Dropdown
@@ -236,9 +261,11 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                         fillColor: Colors.white,
                         hintText: 'Select an option',
                         hintStyle: TextStyle(fontSize: 14.sp),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.h, horizontal: 8.w),
                           child: SvgPicture.asset(
                             AppIcons.dropDownSvg,
                             height: 24.h,
@@ -247,12 +274,14 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                      // ignore: deprecated_member_use
                       value: _selectedStatus, // Bind to _selectedStatus
                       items: ['Pending', 'Approved', 'Denied']
                           .map((status) => DropdownMenuItem(
-                        value: status,
-                        child: Text(status, style: TextStyle(fontSize: 14.sp)),
-                      ))
+                                value: status,
+                                child: Text(status,
+                                    style: TextStyle(fontSize: 14.sp)),
+                              ))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -303,7 +332,7 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                             width: 162.w,
                             containerColor: AppColors.whiteBackgroundColor,
                             border:
-                            Border.all(color: AppColors.textContainerColor),
+                                Border.all(color: AppColors.textContainerColor),
                             style: style,
                           ),
                         ),
@@ -313,22 +342,29 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                             onPress: () async {
                               try {
                                 GoogleSheetService g = GoogleSheetService();
-                                await g.init();
                                 await g.insertTimeOffRequest(
                                   fromDate: _fromDateTEController.text,
                                   toDate: _toDateTEController.text,
                                   notes: _selectedNote!,
                                   status: _selectedStatus!,
-                                  additionalNotes: _additionalStatusTEController.text,
+                                  additionalNotes:
+                                      _additionalStatusTEController.text,
                                 );
+                                // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Data submitted successfully")),
+                                  const SnackBar(
+                                      content:
+                                          Text("Data submitted successfully")),
                                 );
                                 _submit(); // Clear draft and reset form
-                                onStartJobTap(context,"RTO Submitted");
+                                // ignore: use_build_context_synchronously
+                                onStartJobTap(context, "RTO Submitted");
                               } catch (e) {
+                                // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Error submitting data: $e")),
+                                  SnackBar(
+                                      content:
+                                          Text("Error submitting data: $e")),
                                 );
                               }
                             },

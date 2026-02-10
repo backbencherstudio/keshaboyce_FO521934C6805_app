@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 
 class GoogleSheetService {
-  static const _spreadsheetId = "1mJ3Z6t5yLk6JvsMPs48W8s3bdzDXrVZVTDZ1aTRyTu0";
+  static const _spreadsheetId = "1Jq0RW5FX-iIMvpvBpzIoq4wfZPs-kmquwoMTLgIJ67s";
   // static const _spreadsheetId = "16-VVgAtsOs_oEsvmkIAEVEbDhDMfKcBkZbFEO9KsS7c";
   late GSheets _gsheets;
   Spreadsheet? _spreadsheet;
@@ -12,74 +11,70 @@ class GoogleSheetService {
   Worksheet? _worksheetUser3;
 
   Future<void> init() async {
-  try {
-    final credsJson =
-        await rootBundle.loadString('asset/credential.json');
-    final creds = jsonDecode(credsJson);
+    try {
+      final credsJson = await rootBundle.loadString('asset/credential.json');
 
-    _gsheets = GSheets(creds);
-    _spreadsheet = await _gsheets.spreadsheet(_spreadsheetId);
+      _gsheets = GSheets(credsJson);
+      _spreadsheet = await _gsheets.spreadsheet(_spreadsheetId);
 
-    // ---- TOM REPORT ----
-    _worksheet = _spreadsheet!.worksheetByTitle('Tom_Report');
+      // ---- TOM REPORT ----
+      _worksheet = _spreadsheet!.worksheetByTitle('Tom_Report');
 
-    if (_worksheet == null) {
-      final sheet1 = _spreadsheet!.worksheetByTitle('Sheet1');
+      if (_worksheet == null) {
+        final sheet1 = _spreadsheet!.worksheetByTitle('Sheet1');
 
-      if (sheet1 != null) {
-        await sheet1.updateTitle('Tom_Report');
-        _worksheet = sheet1;
-      } else {
-        _worksheet = await _spreadsheet!.addWorksheet('Tom_Report');
+        if (sheet1 != null) {
+          await sheet1.updateTitle('Tom_Report');
+          _worksheet = sheet1;
+        } else {
+          _worksheet = await _spreadsheet!.addWorksheet('Tom_Report');
+        }
+
+        // Insert headers ONCE
+        await _worksheet!.values.insertRow(1, [
+          'Client Name',
+          'Caregiver Name',
+          'Date',
+          'Observations',
+          'Start Time',
+          'End Time',
+          'Timestamp'
+        ]);
       }
 
-      // Insert headers ONCE
-      await _worksheet!.values.insertRow(1, [
-        'Client Name',
-        'Caregiver Name',
-        'Date',
-        'Observations',
-        'Start Time',
-        'End Time',
-        'Timestamp'
-      ]);
-    }
+      // ---- RTO ----
+      _worksheetUser2 = _spreadsheet!.worksheetByTitle('RTO');
+      if (_worksheetUser2 == null) {
+        _worksheetUser2 = await _spreadsheet!.addWorksheet('RTO');
+        await _worksheetUser2!.values.insertRow(1, [
+          'From Date',
+          'To Date',
+          'Notes',
+          'Status',
+          'Additional Notes',
+          'Timestamp'
+        ]);
+      }
 
-    // ---- RTO ----
-    _worksheetUser2 = _spreadsheet!.worksheetByTitle('RTO');
-    if (_worksheetUser2 == null) {
-      _worksheetUser2 = await _spreadsheet!.addWorksheet('RTO');
-      await _worksheetUser2!.values.insertRow(1, [
-        'From Date',
-        'To Date',
-        'Notes',
-        'Status',
-        'Additional Notes',
-        'Timestamp'
-      ]);
+      // ---- ATTENDANCE LOG ----
+      _worksheetUser3 = _spreadsheet!.worksheetByTitle('Attendence_log');
+      if (_worksheetUser3 == null) {
+        _worksheetUser3 = await _spreadsheet!.addWorksheet('Attendence_log');
+        await _worksheetUser3!.values.insertRow(1, [
+          'Date',
+          'Scheduled Shift',
+          'Clock In',
+          'Clock Out',
+          'Status',
+          'Notes',
+          'Violation',
+          'Timestamp'
+        ]);
+      }
+    } catch (e) {
+      throw Exception('Failed to initialize Google Sheets: $e');
     }
-
-    // ---- ATTENDANCE LOG ----
-    _worksheetUser3 =
-        _spreadsheet!.worksheetByTitle('Attendence_log');
-    if (_worksheetUser3 == null) {
-      _worksheetUser3 =
-          await _spreadsheet!.addWorksheet('Attendence_log');
-      await _worksheetUser3!.values.insertRow(1, [
-        'Date',
-        'Scheduled Shift',
-        'Clock In',
-        'Clock Out',
-        'Status',
-        'Notes',
-        'Violation',
-        'Timestamp'
-      ]);
-    }
-  } catch (e) {
-    throw Exception('Failed to initialize Google Sheets: $e');
   }
-}
 
   Future<void> insertUser({
     required String clientname,

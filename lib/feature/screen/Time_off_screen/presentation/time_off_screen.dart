@@ -61,7 +61,6 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
   }
 
   Future<void> _submit() async {
-    // TODO: Handle submit logic (send to server or Google Sheet)
     ref.read(timeOffDraftProvider.notifier).clearDraft();
 
     _fromDateTEController.clear();

@@ -60,36 +60,16 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
     );
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     ref.read(timeOffDraftProvider.notifier).clearDraft();
 
-    _fromDateTEController.clear();
-    _toDateTEController.clear();
-    _selectedNote = null;
-    _selectedStatus = null;
-    _additionalStatusTEController.clear();
-
-    try {
-      GoogleSheetService g = GoogleSheetService();
-      await g.init();
-      await g.insertTimeOffRequest(
-        fromDate: _fromDateTEController.text,
-        toDate: _toDateTEController.text,
-        notes: _selectedNote ?? '',
-        status: _selectedStatus ?? '',
-        additionalNotes: _additionalStatusTEController.text,
-      );
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Submitted Successfully")),
-      );
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error submitting data: $e")),
-      );
-    }
+    setState(() {
+      _fromDateTEController.clear();
+      _toDateTEController.clear();
+      _selectedNote = null;
+      _selectedStatus = null;
+      _additionalStatusTEController.clear();
+    });
   }
 
   Future<void> selectDate(
@@ -340,14 +320,22 @@ class _TimeOffScreenState extends ConsumerState<TimeOffScreen> {
                           child: CustomButton(
                             onPress: () async {
                               try {
+                                // Save values before clearing
+                                final fromDate = _fromDateTEController.text;
+                                final toDate = _toDateTEController.text;
+                                final notes = _selectedNote ?? '';
+                                final status = _selectedStatus ?? '';
+                                final additionalNotes =
+                                    _additionalStatusTEController.text;
+
                                 GoogleSheetService g = GoogleSheetService();
+                                await g.init();
                                 await g.insertTimeOffRequest(
-                                  fromDate: _fromDateTEController.text,
-                                  toDate: _toDateTEController.text,
-                                  notes: _selectedNote!,
-                                  status: _selectedStatus!,
-                                  additionalNotes:
-                                      _additionalStatusTEController.text,
+                                  fromDate: fromDate,
+                                  toDate: toDate,
+                                  notes: notes,
+                                  status: status,
+                                  additionalNotes: additionalNotes,
                                 );
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(

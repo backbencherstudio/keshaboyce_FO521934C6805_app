@@ -21,7 +21,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
-  final TextEditingController _observationsController = TextEditingController(); // Added
+  final TextEditingController _observationsController =
+      TextEditingController(); // Added
 
   String? _selectedShift;
   String? _selectedStatus;
@@ -105,7 +106,7 @@ class _AttendanceLogState extends State<AttendanceLog> {
     );
     if (pickedDate != null) {
       _fromDateController.text =
-      "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
     }
   }
 
@@ -127,7 +128,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
             hintText: 'Select time',
             suffixIcon: Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),
-              child: SvgPicture.asset(AppIcons.clockSvg, height: 16.h, width: 16.w),
+              child: SvgPicture.asset(AppIcons.clockSvg,
+                  height: 16.h, width: 16.w),
             ),
           ),
         ),
@@ -179,7 +181,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    InputLabel(labelText: 'Scheduled Shift*', optional: '*', style: style),
+                    InputLabel(
+                        labelText: 'Scheduled Shift*',
+                        optional: '*',
+                        style: style),
                     SizedBox(height: 8.h),
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
@@ -187,10 +192,13 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         fillColor: Colors.white,
                         hintText: 'Select your shift',
                         hintStyle: style.bodySmall,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg,
+                              height: 24.h, width: 24.w),
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
@@ -198,9 +206,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       value: _selectedShift,
                       items: ['Morning', 'Evening', 'Over Night']
                           .map((shift) => DropdownMenuItem(
-                        value: shift,
-                        child: Text(shift, style: TextStyle(fontSize: 14.sp)),
-                      ))
+                                value: shift,
+                                child: Text(shift,
+                                    style: TextStyle(fontSize: 14.sp)),
+                              ))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -211,13 +220,18 @@ class _AttendanceLogState extends State<AttendanceLog> {
                     SizedBox(height: 12.h),
                     Row(
                       children: [
-                        Expanded(child: _buildTimeField('Clock-In', _startTimeController)),
+                        Expanded(
+                            child: _buildTimeField(
+                                'Clock-In', _startTimeController)),
                         SizedBox(width: 8.w),
-                        Expanded(child: _buildTimeField('Clock-Out', _endTimeController)),
+                        Expanded(
+                            child: _buildTimeField(
+                                'Clock-Out', _endTimeController)),
                       ],
                     ),
                     SizedBox(height: 12.h),
-                    InputLabel(labelText: 'Status', optional: '*', style: style),
+                    InputLabel(
+                        labelText: 'Status', optional: '*', style: style),
                     SizedBox(height: 8.h),
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
@@ -225,10 +239,13 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         fillColor: Colors.white,
                         hintText: 'Select a option',
                         hintStyle: style.bodySmall,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                         suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
-                          child: SvgPicture.asset(AppIcons.dropDownSvg, height: 24.h, width: 24.w),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.h, horizontal: 8.w),
+                          child: SvgPicture.asset(AppIcons.dropDownSvg,
+                              height: 24.h, width: 24.w),
                         ),
                       ),
                       style: TextStyle(fontSize: 14.sp, color: Colors.black),
@@ -236,9 +253,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
                       value: _selectedStatus,
                       items: ['Late Arrival', 'No Show']
                           .map((reason) => DropdownMenuItem(
-                        value: reason,
-                        child: Text(reason, style: TextStyle(fontSize: 14.sp)),
-                      ))
+                                value: reason,
+                                child: Text(reason,
+                                    style: TextStyle(fontSize: 14.sp)),
+                              ))
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -256,8 +274,10 @@ class _AttendanceLogState extends State<AttendanceLog> {
                         hintText: 'Type the notable observations here...',
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 18, horizontal: 16),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                       style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
@@ -274,7 +294,8 @@ class _AttendanceLogState extends State<AttendanceLog> {
                             ),
                             width: 162.w,
                             containerColor: AppColors.whiteBackgroundColor,
-                            border: Border.all(color: AppColors.textContainerColor),
+                            border:
+                                Border.all(color: AppColors.textContainerColor),
                             style: style,
                           ),
                         ),
@@ -292,7 +313,9 @@ class _AttendanceLogState extends State<AttendanceLog> {
                                   _selectedShift == null ||
                                   _selectedStatus == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please fill all required fields")),
+                                  const SnackBar(
+                                      content: Text(
+                                          "Please fill all required fields")),
                                 );
                                 return;
                               }
@@ -306,25 +329,31 @@ class _AttendanceLogState extends State<AttendanceLog> {
                                   clockIn: _startTimeController.text,
                                   clockOut: _endTimeController.text,
                                   status: _selectedStatus!,
-                                  notes: '', // Removed _selectedNote
                                   violation: _observationsController.text,
                                 );
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Data submitted successfully")),
+                                  const SnackBar(
+                                      content:
+                                          Text("Data submitted successfully")),
                                 );
                                 // ignore: use_build_context_synchronously
-                                onStartJobTap(context,"Attendance Log Submitted");
+                                onStartJobTap(
+                                    context, "Attendance Log Submitted");
                                 _clearDraft();
                                 // Replace with appropriate navigation or action
                                 // ignore: use_build_context_synchronously
-                                onStartJobTap(context,'Attendence log Submitted');
+                                onStartJobTap(
+                                    context, 'Attendence log Submitted');
                                 // ignore: use_build_context_synchronously
-                                Navigator.pop(context); // Example: Go back after submission
+                                Navigator.pop(
+                                    context); // Example: Go back after submission
                               } catch (e) {
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Failed to submit data: $e")),
+                                  SnackBar(
+                                      content:
+                                          Text("Failed to submit data: $e")),
                                 );
                               }
                             },

@@ -66,7 +66,6 @@ class GoogleSheetService {
           'Clock In',
           'Clock Out',
           'Status',
-          'Notes',
           'Violation',
           'Timestamp'
         ]);
@@ -134,7 +133,6 @@ class GoogleSheetService {
     required String clockIn,
     required String clockOut,
     required String status,
-    required String notes,
     required String violation,
   }) async {
     if (_worksheetUser3 == null) {
@@ -147,7 +145,6 @@ class GoogleSheetService {
         clockIn,
         clockOut,
         status,
-        notes,
         violation,
         DateTime.now().toIso8601String(),
       ]);

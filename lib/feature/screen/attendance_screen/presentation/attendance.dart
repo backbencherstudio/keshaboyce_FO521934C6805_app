@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_newprojct/core/constant/icons.dart';
 import 'package:flutter_newprojct/core/theme/theme_extension/app_colors.dart';
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/submit_alert_dialog.dart';
@@ -29,6 +30,14 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     super.initState();
     _loadDraft(); // Load saved draft on page open
+      SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light, // White icons on Android
+      statusBarBrightness: Brightness.dark, // White icons on iOS
+    ),
+  );
+
   }
 
 
@@ -64,6 +73,7 @@ class _AttendanceState extends State<Attendance> {
 
     await draftBox.put('attendance_draft', draftData); // Save by key
 
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Draft Saved Successfully")),
     );
@@ -187,11 +197,14 @@ class _AttendanceState extends State<Attendance> {
                               end_time: _endTimeController.text,
                               observation: _observationsController.text,
                             );
+                            // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Data submitted successfully")),
                             );
+                            // ignore: use_build_context_synchronously
                             onStartJobTap(context,'Tom Submitted');
                           } catch (e) {
+                            // ignore: use_build_context_synchronously
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Error submitting data: $e")),
                             );

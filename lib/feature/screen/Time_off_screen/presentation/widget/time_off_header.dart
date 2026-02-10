@@ -31,7 +31,7 @@ class TimeOffHeader extends StatelessWidget {
             // Back Button Fixed
             GestureDetector(
               onTap: () => Navigator.pop(context),
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_back,
                 size: 24,
                 color: AppColors.whiteBackgroundColor,

@@ -33,7 +33,7 @@ class RouteConfig {
         name: RouteName.timeOffscreen,
         path: RouteName.timeOffscreen,
         pageBuilder: (context, state) =>
-            MaterialPage(child: TimeOffScreen()),
+            const MaterialPage(child: TimeOffScreen()),
       ),
       GoRoute(
         name: RouteName.attendanceLog,

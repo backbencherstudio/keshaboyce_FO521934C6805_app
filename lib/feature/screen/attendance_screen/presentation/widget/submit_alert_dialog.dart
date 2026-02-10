@@ -30,7 +30,7 @@ void onStartJobTap(BuildContext context, String title) {
                 width: 154,
                 height: 148,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 14,
               ),
               Text(
@@ -40,7 +40,7 @@ void onStartJobTap(BuildContext context, String title) {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               Text(
@@ -51,7 +51,7 @@ void onStartJobTap(BuildContext context, String title) {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               CustomButton(
@@ -61,7 +61,7 @@ void onStartJobTap(BuildContext context, String title) {
                 },
                 style: style,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               CustomButton(

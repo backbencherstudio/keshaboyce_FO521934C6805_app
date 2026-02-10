@@ -83,6 +83,7 @@ Future<void> selectTime(
   );
 
   if (pickedTime != null) {
+    // ignore: use_build_context_synchronously
     controller.text = pickedTime.format(context);
   }
 }

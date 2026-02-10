@@ -6,33 +6,34 @@ class CustomDatePickerTheme {
     backgroundColor: Colors.white,
     headerBackgroundColor: AppColors.primary,
     headerForegroundColor: Colors.white,
-    dayForegroundColor: MaterialStateColor.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    dayForegroundColor: WidgetStateColor.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return Colors.white;
-      } else if (states.contains(MaterialState.disabled)) {
+      } else if (states.contains(WidgetState.disabled)) {
         return Colors.grey;
       }
       return AppColors.primary;
     }),
-    dayBackgroundColor: MaterialStateColor.resolveWith((states) {
-      if (states.contains(MaterialState.selected)) {
+    dayBackgroundColor: WidgetStateColor.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
         return AppColors.primary;
-      } else if (states.contains(MaterialState.disabled)) {
+      } else if (states.contains(WidgetState.disabled)) {
         return Colors.grey.shade200;
       }
       return Colors.transparent;
     }),
-    todayForegroundColor: WidgetStatePropertyAll(AppColors.primary),
+    todayForegroundColor: const WidgetStatePropertyAll(AppColors.primary),
     todayBackgroundColor: WidgetStatePropertyAll(
+      // ignore: deprecated_member_use
       AppColors.primary.withOpacity(0.1),
     ),
-    yearForegroundColor: MaterialStateColor.resolveWith((states) {
-      return states.contains(MaterialState.selected)
+    yearForegroundColor: WidgetStateColor.resolveWith((states) {
+      return states.contains(WidgetState.selected)
           ? Colors.white
           : AppColors.primary;
     }),
-    yearBackgroundColor: MaterialStateColor.resolveWith((states) {
-      return states.contains(MaterialState.selected)
+    yearBackgroundColor: WidgetStateColor.resolveWith((states) {
+      return states.contains(WidgetState.selected)
           ? AppColors.primary
           : Colors.transparent;
     }),

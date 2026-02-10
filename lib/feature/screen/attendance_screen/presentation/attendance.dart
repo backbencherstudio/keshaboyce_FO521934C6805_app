@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_newprojct/core/constant/icons.dart';
 import 'package:flutter_newprojct/core/theme/theme_extension/app_colors.dart';
 import 'package:flutter_newprojct/feature/screen/attendance_screen/presentation/widget/submit_alert_dialog.dart';
@@ -29,6 +30,14 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     super.initState();
     _loadDraft(); // Load saved draft on page open
+      SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light, // White icons on Android
+      statusBarBrightness: Brightness.dark, // White icons on iOS
+    ),
+  );
+
   }
 
 

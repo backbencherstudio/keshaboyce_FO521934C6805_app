@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_newprojct/core/routes/route_config.dart';
 import 'package:flutter_newprojct/core/theme/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +9,14 @@ import 'core/service/google_sheet_api.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light, // White icons on Android
+      statusBarBrightness: Brightness.dark, // White icons on iOS
+    ),
+  );
 
   // Initialize Hive
   await Hive.initFlutter();

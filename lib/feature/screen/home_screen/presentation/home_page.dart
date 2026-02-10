@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/routes/route_name.dart';
@@ -9,11 +10,18 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light, // White icons on Android
+        statusBarBrightness: Brightness.dark, // White icons on iOS
+      ),
+    );
+
     final style = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8F9),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -21,7 +29,7 @@ class HomeScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                 color:  const Color(0xff092549),
+                color: const Color(0xff092549),
                 borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(8.r),
                   bottomLeft: Radius.circular(8.r),

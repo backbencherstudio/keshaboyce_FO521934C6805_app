@@ -339,14 +339,17 @@ class _AttendanceLogState extends State<AttendanceLog> {
                                 );
                                 // ignore: use_build_context_synchronously
                                 onStartJobTap(
+                                    // ignore: use_build_context_synchronously
                                     context, "Attendance Log Submitted");
                                 _clearDraft();
                                 // Replace with appropriate navigation or action
                                 // ignore: use_build_context_synchronously
                                 onStartJobTap(
+                                    // ignore: use_build_context_synchronously
                                     context, 'Attendence log Submitted');
                                 // ignore: use_build_context_synchronously
                                 Navigator.pop(
+                                    // ignore: use_build_context_synchronously
                                     context); // Example: Go back after submission
                               } catch (e) {
                                 // ignore: use_build_context_synchronously
